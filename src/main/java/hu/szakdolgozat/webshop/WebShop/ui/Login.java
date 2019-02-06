@@ -101,8 +101,8 @@ public class Login extends VerticalLayout {
                 System.out.println(user.getFirstName() + user.getLastName() + user.getPassword());
                 System.out.println(firstName.getValue() + lastName.getValue() + password.getValue());
                 button.setVisible(true);
-                String sessionID = ((VaadinServletRequest) VaadinService.getCurrentRequest())
-                        .getHttpServletRequest().getSession().getId();
+                //String sessionID = ((VaadinServletRequest) VaadinService.getCurrentRequest())
+                        //.getHttpServletRequest().getSession().getId();
 
             }
         } else {
