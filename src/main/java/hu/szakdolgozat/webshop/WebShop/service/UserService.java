@@ -8,4 +8,5 @@ public interface UserService {
     void delete(User user);
     Iterable<User> getAllUsers();
     User findByFirstName(String name);
+    User findByUserName(String name);
 }

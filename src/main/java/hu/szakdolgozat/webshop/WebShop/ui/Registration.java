@@ -40,6 +40,7 @@ public class Registration extends VerticalLayout {
     FormLayout layoutWithBinder = new FormLayout();
     private TextField firstName = new TextField();
     private TextField lastName = new TextField();
+    private TextField userName = new TextField();
     private PasswordField password = new PasswordField();
     private TextField address = new TextField();
     private TextField email = new TextField();
@@ -86,6 +87,8 @@ public class Registration extends VerticalLayout {
 
         lastName.setValueChangeMode(ValueChangeMode.EAGER);
 
+        userName.setValueChangeMode(ValueChangeMode.EAGER);
+
         password.setValueChangeMode(ValueChangeMode.EAGER);
 
         address.setValueChangeMode(ValueChangeMode.EAGER);
@@ -95,6 +98,7 @@ public class Registration extends VerticalLayout {
 
         layoutWithBinder.addFormItem(firstName, "First name");
         layoutWithBinder.addFormItem(lastName, "Last name");
+        layoutWithBinder.addFormItem(userName, "Username");
         layoutWithBinder.addFormItem(password, "Password");
         layoutWithBinder.addFormItem(address, "Address");
         layoutWithBinder.addFormItem(email, "E-mail");
@@ -104,6 +108,7 @@ public class Registration extends VerticalLayout {
 
         firstName.setRequiredIndicatorVisible(true);
         lastName.setRequiredIndicatorVisible(true);
+        userName.setRequiredIndicatorVisible(true);
         password.setRequiredIndicatorVisible(true);
         email.setRequiredIndicatorVisible(true);
         address.setRequiredIndicatorVisible(true);
@@ -116,6 +121,10 @@ public class Registration extends VerticalLayout {
                 .withValidator(new StringLengthValidator(
                         "Please add the last name", 2, 25))
                 .bind(User::getLastName, User::setLastName);
+        binder.forField(userName)
+                .withValidator(new StringLengthValidator(
+                        "Username length must be min 4 max 25",  4,25))
+                .bind(User::getUserName, User::setUserName);
         binder.forField(password)
                 .withValidator(new StringLengthValidator(
                         "Password length must be min 7 and max 25", 7, 25))

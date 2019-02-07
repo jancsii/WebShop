@@ -22,8 +22,8 @@ public class Login extends VerticalLayout {
     @Autowired
     UserService userService;
 
-    private TextField firstName = new TextField("First name");
-    private TextField lastName = new TextField("Last name");
+    private TextField userName = new TextField("Username");
+    //private TextField lastName = new TextField("Last name");
     private PasswordField password = new PasswordField("Password");
     private User user = new User();
     NativeButton button = new NativeButton("Go to Products");
@@ -31,75 +31,37 @@ public class Login extends VerticalLayout {
 
     public Login() {
 
-
-        /*String basepath = VaadinService.getCurrent()
-                .getBaseDirectory().getAbsolutePath();
-
-        FileResource resource = new FileResource(new File(basepath +
-                "/WEB-INF/images/videocard1.png"));
-
-        Image image = new Image("",resource);
-        addComponent(image);
-        /*setSizeFull();
-
-        Button button = new Button("Go to Main View",
-                (Button.ClickListener) event -> navigator.navigateTo(MAINVIEW));
-        addComponent(button);
-        setComponentAlignment(button, Alignment.MIDDLE_CENTER);
-        */
-
-
-
     }
 
     @PostConstruct
     public void init()
     {
-
-
-        //user = userService.findByFirstName("Proba");//(firstName.getValue());
         List<User> users = new ArrayList<>();
         users=(List)userService.getAllUsers();
 
-        //System.out.println(user);
         System.out.println(users);
 
-        //if(!firstName.getValue().isEmpty() && !lastName.getValue().isEmpty() && !password.getValue().isEmpty()) {
-            testButton.addClickListener(e -> {
+        testButton.addClickListener(e -> {
             testUser();
-            //} else {
-            //System.out.println("Nope");
-            //}
             });
-        //}
 
-        //if(user.getFirstName()!=null && user.getPassword().equals(String.valueOf(password)))
-        //{
-            button.addClickListener( event-> {
-                button.getUI().ifPresent(ui -> ui.navigate("products"));
+        button.addClickListener( event-> {
+            button.getUI().ifPresent(ui -> ui.navigate("products"));
             });
-            button.setVisible(false);
-        //}
-        //else
-        //{
-            //dialog.open();
-        //}
+        button.setVisible(false);
 
-
-        add(firstName, lastName, password, testButton, button);
-
-
+        add(userName, password, testButton, button);
     }
 
     private void testUser() {
 
-        user = userService.findByFirstName(firstName.getValue());
+        user = userService.findByUserName(userName.getValue());
 
         if (user!=null) {
-            if(user.getLastName().equals(lastName.getValue()) && user.getPassword().equals(password.getValue())) {
+            if(user.getUserName().equals(userName.getValue()) && user.getPassword().equals(password.getValue())) {
                 System.out.println("Nice");
-                System.out.println(user.getFirstName() + user.getLastName() + user.getPassword());
-                System.out.println(firstName.getValue() + lastName.getValue() + password.getValue());
+                System.out.println(user.getFirstName() + user.getLastName() + user.getUserName() + user.getPassword());
+                System.out.println(userName.getValue() + password.getValue());
                 button.setVisible(true);
                 //String sessionID = ((VaadinServletRequest) VaadinService.getCurrentRequest())
                         //.getHttpServletRequest().getSession().getId();
