@@ -1,5 +1,6 @@
 package hu.szakdolgozat.webshop.WebShop.ui;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.board.Board;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
@@ -10,9 +11,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.spring.annotation.UIScope;
 import hu.szakdolgozat.webshop.WebShop.entity.Product;
 
 import javax.annotation.PostConstruct;
+import java.awt.*;
 import java.util.ArrayList;
 
 @Route("purchase")
@@ -32,17 +36,17 @@ public class Purchase extends VerticalLayout {
     {
         menu();
 
-        this.getStyle().set("border-style", "groove");
-        this.getStyle().set("height", "555px");
-
+        //this.getStyle().set("border-style", "groove");
+        //this.getStyle().set("height", "555px");
     }
 
     public void listElements(ColumnLay product) {
 
+        System.out.println("Current Vaadin Session: " + VaadinSession.getCurrent());
         containerBoard.addRow(product);
         add(containerBoard);
 
-
+        System.out.println(product);
         System.out.println("Purchase...");
 //        this.container.add(s);
 //        label.setText(label.getText() + " " + this.container.get(this.container.size()-1));

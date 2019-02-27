@@ -23,11 +23,12 @@ public class Login extends VerticalLayout {
     UserService userService;
 
     private TextField userName = new TextField("Username");
-    //private TextField lastName = new TextField("Last name");
     private PasswordField password = new PasswordField("Password");
     private User user = new User();
     NativeButton button = new NativeButton("Go to Products");
     NativeButton testButton = new NativeButton("Test");
+    private boolean isAdmin = false;
+
 
     public Login() {
 
@@ -45,9 +46,6 @@ public class Login extends VerticalLayout {
             testUser();
             });
 
-        button.addClickListener( event-> {
-            button.getUI().ifPresent(ui -> ui.navigate("products"));
-            });
         button.setVisible(false);
 
         add(userName, password, testButton, button);
@@ -57,12 +55,24 @@ public class Login extends VerticalLayout {
 
         user = userService.findByUserName(userName.getValue());
 
-        if (user!=null) {
+        if(userName.getValue().equals("admin") && password.getValue().equals("admin")) {
+            isAdmin = true;
+            button.setVisible(true);
+
+            button.addClickListener( event-> {
+                button.getUI().ifPresent(ui -> ui.navigate("admin"));
+            });
+        }
+        else if (user!=null) {
             if(user.getUserName().equals(userName.getValue()) && user.getPassword().equals(password.getValue())) {
                 System.out.println("Nice");
                 System.out.println(user.getFirstName() + user.getLastName() + user.getUserName() + user.getPassword());
                 System.out.println(userName.getValue() + password.getValue());
                 button.setVisible(true);
+
+                button.addClickListener(event -> {
+                    button.getUI().ifPresent(ui -> ui.navigate("products"));
+                });
                 //String sessionID = ((VaadinServletRequest) VaadinService.getCurrentRequest())
                         //.getHttpServletRequest().getSession().getId();
 

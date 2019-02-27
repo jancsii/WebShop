@@ -53,31 +53,6 @@ public class Registration extends VerticalLayout {
 
     public Registration() {
 
-        /*name.setPattern("[a-zA-Z]*");
-        name.setPreventInvalidInput(true);
-        name.setRequired(true);
-
-
-        Binder<User> binder
-                = new BeanValidationBinder<>(User.class);
-        binder.bindInstanceFields(this);
-        binder.setBean(user);
-
-        binder.forField(name).withValidator(n -> n.length() >= 7, "Full name must contain at least seven characters")
-            .bind(User::getName, User::setName);
-
-        Button registration = new Button("Registration");
-        registration.addClickListener(e -> userService.save(user));
-
-
-        NativeButton button = new NativeButton("Login");
-        button.addClickListener( e-> {
-            button.getUI().ifPresent(ui -> ui.navigate("login"));
-        });
-        add(name, password, address, email, registration, button);
-        */
-
-
         Binder<User> binder = new BeanValidationBinder<>(User.class);  //new Binder<>();
         binder.bindInstanceFields(this);
         binder.setBean(user);

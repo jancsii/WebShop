@@ -12,7 +12,10 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.spring.annotation.UIScope;
 import hu.szakdolgozat.webshop.WebShop.entity.Product;
 import hu.szakdolgozat.webshop.WebShop.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +25,9 @@ import java.awt.*;
 import java.util.ArrayList;
 
 
-@StyleSheet("frontend/css/products.css")
+//@StyleSheet("frontend/css/products.css")
 @Route("products")
-public class Products extends  VerticalLayout {
+public class Products extends VerticalLayout {
 
     @Autowired
     ProductService productService;
@@ -36,17 +39,17 @@ public class Products extends  VerticalLayout {
         //this.grid = new Grid<>(Product.class);
         //add(grid);
         //this.getStyle().set("width", "95%");
-
     }
 
     public void counterInc()
     {
+        System.out.println("Current Vaadin Session: " + VaadinSession.getCurrent());
         System.out.println(counter.getText());
-        int temp = Integer.parseInt(this.counter.getText());
+        int temp = Integer.parseInt(counter.getText());//(this.counter.getText());
         System.out.println(temp);
         temp++;
         System.out.println(temp);
-        this.counter.setText(String.valueOf(temp));
+        counter.setText(String.valueOf(temp));//this.counter.setText(String.valueOf(temp));
         counter = new Label("1");
 
         System.out.println(counter.getText());
@@ -77,6 +80,7 @@ public class Products extends  VerticalLayout {
             ColumnLay columnLay = new ColumnLay(products.get(i).getName(), "frontend/images/" +
                     products.get(i).getImage(), products.get(i).getPrice(), products.get(i).getQuantity());
             storingTemp.add(columnLay);
+            System.out.println("This: " + this);
 
             if(storingTemp.size()==4)
             {

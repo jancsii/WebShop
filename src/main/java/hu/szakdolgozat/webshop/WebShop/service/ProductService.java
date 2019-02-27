@@ -8,4 +8,6 @@ public interface ProductService {
 
     Product getProduct(int id);
 
+    void save(Product product);
+
 }
