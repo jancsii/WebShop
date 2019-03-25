@@ -32,4 +32,11 @@ public class ProductServiceImpl implements ProductService{
 
         productRepository.saveAndFlush(product);
     }
+
+    @Override
+    public Product findByName(String name) { return productRepository.findByName(name); }
+
+    public void delete(Product product) {
+        productRepository.delete(product);
+    }
 }

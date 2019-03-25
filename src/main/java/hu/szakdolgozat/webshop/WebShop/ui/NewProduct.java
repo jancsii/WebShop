@@ -1,5 +1,6 @@
 package hu.szakdolgozat.webshop.WebShop.ui;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -40,26 +41,28 @@ public class NewProduct extends VerticalLayout {
     private Label productQuantityLabel = new Label("Product Quantity: ");
     private Label productDescriptionLabel = new Label("Product Description: ");
     private Label errorLabel = new Label();
+    private Product product = new Product();
+    UI ui;
 
-    @PostConstruct
-    public void init()
-    {
-        products.addClickListener( event-> {
-            products.getUI().ifPresent(ui -> ui.navigate("admin"));
-        });
+    public NewProduct() {
 
         add.addClickListener( event -> {
             ArrayList<String> errors = newProductValidation.productNameValidation(productName.getValue(),
                     productImage.getValue(), productCategory.getValue(), productPrice.getValue(),
                     productQuantity.getValue(), productDescription.getValue());
 
+            System.out.println("Errors: " + errors);
+
             if(!(errors.isEmpty())) {
+
                 errorLabel.setText("");
-                System.out.println(joiningErrors(errors));
                 errorLabel.setText(joiningErrors(errors));
+
+                errors.clear();
+
             } else {
-                errorLabel.setText("");
-                Product product = new Product();
+                //errorLabel.setText("");
+                errorLabel.setVisible(false);
                 product.setName(productName.getValue());
                 product.setImage(productImage.getValue());
                 product.setCategory(productCategory.getValue());
@@ -70,6 +73,14 @@ public class NewProduct extends VerticalLayout {
                 System.out.println(product);
             }
 
+        });
+    }
+
+    @PostConstruct
+    public void init()
+    {
+        products.addClickListener( event-> {
+            products.getUI().ifPresent(ui -> ui.navigate("admin"));
         });
 
         productName.setMaxLength(50);
@@ -84,14 +95,14 @@ public class NewProduct extends VerticalLayout {
 
         add(add);
 
+        errorLabel.getStyle().set("color", "red");
+
         add(errorLabel);
     }
 
     private String joiningErrors(ArrayList<String> errors) {
 
-        String errorContainer = "";
-
-        errorContainer = String.join("\n", errors);
+        String errorContainer = String.join("\n", errors);
 
         return errorContainer;
 

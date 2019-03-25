@@ -1,9 +1,12 @@
 package hu.szakdolgozat.webshop.WebShop.ui;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.board.Board;
 import com.vaadin.flow.component.board.Row;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import hu.szakdolgozat.webshop.WebShop.entity.Product;
 import hu.szakdolgozat.webshop.WebShop.service.ProductService;
@@ -11,9 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.EventObject;
 
 @Route("admin")
-public class Admin extends VerticalLayout {
+public class Admin extends VerticalLayout implements BeforeEnterObserver {
 
     @Autowired
     ProductService productService;
@@ -23,13 +27,25 @@ public class Admin extends VerticalLayout {
     @PostConstruct
     public void init()
     {
-        ArrayList<Product> products = (ArrayList<Product>) productService.getAllProducts();
+        if("admin".equals(UI.getCurrent().getSession().getAttribute("username"))) {
+            ArrayList<Product> products = (ArrayList<Product>) productService.getAllProducts();
 
-        listingProducts(products);
+            listingProducts(products);
 
-        newProduct.addClickListener( event-> {
-            newProduct.getUI().ifPresent(ui -> ui.navigate("admin/newproduct"));
-        });
+            newProduct.addClickListener( event-> {
+                newProduct.getUI().ifPresent(ui -> ui.navigate("admin/newproduct"));
+            });
+        } else {
+            getUI().ifPresent(ui -> ui.navigate("login"));
+        }
+
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        if (!"admin".equals(UI.getCurrent().getSession().getAttribute("username"))) {
+            beforeEnterEvent.rerouteTo("login");
+        }
     }
 
     public void listingProducts(ArrayList<Product> products) {
@@ -37,11 +53,16 @@ public class Admin extends VerticalLayout {
         int productsNum = products.size();
         Board board = new Board();
         ArrayList<ColumnLay> storingTemp = new ArrayList<>();
+        int productId;
 
         for(int i=0; i<productsNum; i++)
         {
-            ColumnLay columnLay = new ColumnLay(products.get(i).getName(), "frontend/images/" +
-                    products.get(i).getImage(), products.get(i).getPrice(), products.get(i).getQuantity());
+            //productId = productService.findByName(products.get(i).getName()).getId();
+            ColumnLay columnLay = new ColumnLay(products.get(i).getId(), products.get(i).getName(), products.get(i).getPrice(),
+                    products.get(i).getQuantity(), products.get(i).getImage(), products.get(i).getCategory(), products.get(i).getDescription(),
+                    productService);
+            //ColumnLay columnLay = new ColumnLay(products.get(i).getName(), "frontend/images/" +
+            //        products.get(i).getImage(), products.get(i).getPrice(), products.get(i).getQuantity());
             storingTemp.add(columnLay);
             System.out.println("This: " + this);
 

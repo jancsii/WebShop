@@ -1,6 +1,7 @@
 package hu.szakdolgozat.webshop.WebShop.ui;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.board.Board;
 import com.vaadin.flow.component.board.Row;
 import com.vaadin.flow.component.button.Button;
@@ -19,8 +20,11 @@ import com.vaadin.flow.spring.annotation.UIScope;
 import hu.szakdolgozat.webshop.WebShop.entity.Product;
 import hu.szakdolgozat.webshop.WebShop.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpSession;
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -67,6 +71,9 @@ public class Products extends VerticalLayout {
         listingProducts(products);
 
         footer();
+
+        System.out.println(UI.getCurrent().getSession().getAttribute("username"));
+        System.out.println(UI.getCurrent().getSession());
     }
 
     public void listingProducts(ArrayList<Product> products) {
@@ -77,8 +84,8 @@ public class Products extends VerticalLayout {
 
         for(int i=0; i<productsNum; i++)
         {
-            ColumnLay columnLay = new ColumnLay(products.get(i).getName(), "frontend/images/" +
-                    products.get(i).getImage(), products.get(i).getPrice(), products.get(i).getQuantity());
+            ColumnLay columnLay = new ColumnLay(products.get(i).getId(), products.get(i).getName(), "frontend/images/" +
+                    products.get(i).getImage(), products.get(i).getPrice(), products.get(i).getQuantity(), products.get(i).getDescription());
             storingTemp.add(columnLay);
             System.out.println("This: " + this);
 
@@ -116,10 +123,12 @@ public class Products extends VerticalLayout {
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.setWidth("96%");
         horizontalLayout.getStyle().set("margin", "auto");
-        Button login = new Button("Go to Login");
+        Button login = new Button("Login");
         horizontalLayout.add(login);
-        NativeButton registration = new NativeButton("Go to Registration");
+        NativeButton registration = new NativeButton("Registration");
         horizontalLayout.add(registration);
+        Button logout = new Button("Logout");
+        horizontalLayout.add(logout);
 
         Button cartLogo = new Button();
         Image img = new Image("frontend/images/cart.png", "Cant display the image!");
@@ -131,9 +140,15 @@ public class Products extends VerticalLayout {
 
         horizontalLayout.getStyle().set("background-color", "grey");
 
-        cartLogo.addClickListener( event-> {
-            cartLogo.getUI().ifPresent(ui -> ui.navigate("purchase"));
-        });
+//        if(session.getAttribute("username") != null){
+//            cartLogo.addClickListener( event-> {
+//                cartLogo.getUI().ifPresent(ui -> ui.navigate("purchase"));
+//            });
+//        } else {
+//            cartLogo.addClickListener( event-> {
+//                cartLogo.getUI().ifPresent(ui -> ui.navigate("login"));
+//            });
+//        }
 
         login.addClickListener( event-> {
             login.getUI().ifPresent(ui -> ui.navigate("login"));
@@ -143,7 +158,12 @@ public class Products extends VerticalLayout {
             registration.getUI().ifPresent(ui -> ui.navigate(""));
         });
 
-        login.getStyle().set("margin-left", "auto");
+        logout.addClickListener( event-> {
+            //logout.getUI().ifPresent(ui -> ui.navigate("login"));
+
+        });
+
+        login.getStyle().set("margin-left", "30px"); //"auto");
         login.getStyle().set("theme", "primary");
         login.getStyle().set("margin-top", "17.5px");
         login.getStyle().set("margin-bottom", "17.5px");
@@ -151,6 +171,10 @@ public class Products extends VerticalLayout {
         registration.getStyle().set("margin-top", "10px");
         registration.getStyle().set("margin-bottom", "10px");
         registration.getStyle().set("margin-right", "20px");
+        logout.getStyle().set("theme", "primary");
+        logout.getStyle().set("margin-top", "10px");
+        logout.getStyle().set("margin-bottom", "10px");
+        logout.getStyle().set("margin-right", "20px");
         cartLogo.getStyle().set("margin", "19px 10px 16px 0px");
         cartLogo.getStyle().set("padding", "0px 0px 0px 0px");
         counter.getStyle().set("margin-left", "10px");

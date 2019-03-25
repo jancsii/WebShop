@@ -10,4 +10,8 @@ public interface ProductService {
 
     void save(Product product);
 
+    Product findByName(String name);
+
+    void delete(Product product);
+
 }

@@ -8,6 +8,7 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.NativeButton;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 
 import com.vaadin.flow.component.html.Label;
@@ -34,7 +35,12 @@ public class Purchase extends VerticalLayout {
     @PostConstruct
     public void init()
     {
-        menu();
+        System.out.println(UI.getCurrent().getSession().getAttribute("username"));
+        if(UI.getCurrent().getSession().getAttribute("username") != null) {
+            menu();
+        } else {
+            getUI().ifPresent(ui -> ui.navigate("denied"));
+        }
 
         //this.getStyle().set("border-style", "groove");
         //this.getStyle().set("height", "555px");
@@ -85,7 +91,7 @@ public class Purchase extends VerticalLayout {
             registration.getUI().ifPresent(ui -> ui.navigate(""));
         });
 
-        login.getStyle().set("margin-left", "auto");
+        login.getStyle().set("margin-left", "30px"); //"auto");
         login.getStyle().set("theme", "primary");
         login.getStyle().set("margin-top", "17.5px");
         login.getStyle().set("margin-bottom", "17.5px");
