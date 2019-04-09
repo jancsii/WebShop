@@ -13,51 +13,98 @@ import com.vaadin.flow.router.Route;
 
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.server.WrappedSession;
+import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
+import hu.szakdolgozat.webshop.WebShop.ApplicationContextHolder;
+import hu.szakdolgozat.webshop.WebShop.entity.Cart;
 import hu.szakdolgozat.webshop.WebShop.entity.Product;
+import hu.szakdolgozat.webshop.WebShop.entity.User;
+import hu.szakdolgozat.webshop.WebShop.service.CartService;
+import hu.szakdolgozat.webshop.WebShop.service.ProductService;
+import hu.szakdolgozat.webshop.WebShop.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 @Route("purchase")
-public class Purchase extends VerticalLayout {
+public class Purchase extends VerticalLayout{
+
+
+    CartService cartService = ApplicationContextHolder.getContext().getBean(CartService.class);
+
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    ProductService productService;
 
     private Label label = new Label("Heyyy");
     private ArrayList<String> container = new ArrayList<>();
     private Board containerBoard = new Board();
     private VerticalLayout verticalLayout = new VerticalLayout();
+    private ArrayList<Cart> cartContent = new ArrayList<>();
+    private Label counter = new Label("0");
+    int count = 0;
+    VaadinSession session = UI.getCurrent().getSession();
+    WrappedSession wrappedSession;
 
     public Purchase() {
-
     }
 
     @PostConstruct
     public void init()
     {
-        System.out.println(UI.getCurrent().getSession().getAttribute("username"));
-        if(UI.getCurrent().getSession().getAttribute("username") != null) {
+        wrappedSession = session.getSession();
+
+        if(wrappedSession.getAttribute("username") != null) {
             menu();
+            listPurchasedElements();
         } else {
-            getUI().ifPresent(ui -> ui.navigate("denied"));
+            UI.getCurrent().navigate("");
+            UI.getCurrent().getPage().executeJavaScript("location.reload();");
         }
 
-        //this.getStyle().set("border-style", "groove");
-        //this.getStyle().set("height", "555px");
+        counterInc();
     }
 
-    public void listElements(ColumnLay product) {
+    public void counterInc()
+    {
+        counter.setText(String.valueOf(count));
+    }
 
-        System.out.println("Current Vaadin Session: " + VaadinSession.getCurrent());
-        containerBoard.addRow(product);
+    public void listPurchasedElements() {
+
+        User user = userService.findByUserName(wrappedSession.getAttribute("username").toString());
+
+        try {
+            if(cartService.getAllCart() != null) {
+                cartContent = (ArrayList<Cart>) cartService.getAllCart();
+                for(int i=0; i<cartContent.size(); i++) {
+                    if(cartContent.get(i).getUserId() == user.getId()) {
+                        ColumnLay columnLay = new ColumnLay(productService.getProduct(cartContent.get(i).getProductId()).getName(),
+                                productService.getProduct(cartContent.get(i).getProductId()).getCategory(),
+                                productService.getProduct(cartContent.get(i).getProductId()).getPrice(),
+                                productService.getProduct(cartContent.get(i).getProductId()).getImage(),
+                                productService.getProduct(cartContent.get(i).getProductId()).getQuantity(),
+                                productService.getProduct(cartContent.get(i).getProductId()).getId(),
+                                user.getId(), cartContent.get(i).getId());
+                        containerBoard.addRow(columnLay);
+                        count++;
+                    }
+                }
+            }
+        } catch(Exception e) {
+            System.out.println("Exception: " + e);
+        }
+
         add(containerBoard);
-
-        System.out.println(product);
-        System.out.println("Purchase...");
-//        this.container.add(s);
-//        label.setText(label.getText() + " " + this.container.get(this.container.size()-1));
-//        add(label);
-
     }
 
     public void menu()
@@ -76,20 +123,15 @@ public class Purchase extends VerticalLayout {
         img.setHeight("45px");
         cartLogo.setIcon(img);
         horizontalLayout.add(cartLogo);
+        horizontalLayout.add(counter);
 
         horizontalLayout.getStyle().set("background-color", "grey");
 
-        cartLogo.addClickListener( event-> {
-            cartLogo.getUI().ifPresent(ui -> ui.navigate("purchase"));
-        });
+        cartLogo.addClickListener( event-> cartLogo.getUI().ifPresent(ui -> ui.navigate("purchase")));
 
-        login.addClickListener( event-> {
-            login.getUI().ifPresent(ui -> ui.navigate("login"));
-        });
+        login.addClickListener( event-> login.getUI().ifPresent(ui -> ui.navigate("login")));
 
-        registration.addClickListener( event-> {
-            registration.getUI().ifPresent(ui -> ui.navigate(""));
-        });
+        registration.addClickListener( event-> registration.getUI().ifPresent(ui -> ui.navigate("")));
 
         login.getStyle().set("margin-left", "30px"); //"auto");
         login.getStyle().set("theme", "primary");
@@ -101,6 +143,12 @@ public class Purchase extends VerticalLayout {
         registration.getStyle().set("margin-right", "20px");
         cartLogo.getStyle().set("margin", "19px 10px 16px 0px");
         cartLogo.getStyle().set("padding", "0px 0px 0px 0px");
+        counter.getStyle().set("margin-left", "10px");
+        counter.getStyle().set("margin-right", "20px");
+        counter.getStyle().set("text-align", "center");
+        counter.getStyle().set("font-weight", "bold");
+        counter.getStyle().set("font-size", "40px");
+        counter.getStyle().set("color", "black");
 
         add(horizontalLayout);
     }

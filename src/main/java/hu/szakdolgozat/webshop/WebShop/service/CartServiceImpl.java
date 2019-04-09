@@ -5,10 +5,9 @@ import com.vaadin.flow.spring.annotation.UIScope;
 import hu.szakdolgozat.webshop.WebShop.entity.Cart;
 import hu.szakdolgozat.webshop.WebShop.repository.CartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-@SpringComponent
-@UIScope
 @Service
 public class CartServiceImpl implements CartService{
 
@@ -29,4 +28,7 @@ public class CartServiceImpl implements CartService{
     public void save(Cart cart) {
         cartRepository.saveAndFlush(cart);
     }
+
+    @Override
+    public void delete(Cart cart) { cartRepository.delete(cart); }
 }

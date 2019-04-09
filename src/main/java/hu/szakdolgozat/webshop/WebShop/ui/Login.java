@@ -10,15 +10,21 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.*;
+import com.vaadin.flow.spring.annotation.EnableVaadin;
+import com.vaadin.flow.spring.annotation.UIScope;
 import hu.szakdolgozat.webshop.WebShop.entity.User;
+import hu.szakdolgozat.webshop.WebShop.service.CartService;
 import hu.szakdolgozat.webshop.WebShop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.*;
@@ -29,83 +35,65 @@ public class Login extends VerticalLayout{
     @Autowired
     UserService userService;
 
+    @Autowired
+    CartService cartService;
+
     public final static String LOGIN = "login";
 
     private TextField userName = new TextField("Username");
     private PasswordField password = new PasswordField("Password");
     private User user = new User();
-    NativeButton productsButton = new NativeButton("Products =>");
     NativeButton loginButton = new NativeButton("Login");
     private boolean isAdmin = false;
     Notification notification = new Notification(
-            "Successful login!", 5000, Notification.Position.TOP_CENTER);
+            "Successful login!", 2000, Notification.Position.TOP_CENTER);
     Notification notification2 = new Notification(
-            "Login failed!", 5000, Notification.Position.TOP_CENTER);
+            "Login failed!", 3000, Notification.Position.TOP_CENTER);
 
-    //HttpServlet request = new HttpServlet() {};
-    //HttpServlet response = new HttpServlet() {};
-    //HttpSession session = request.getSession();
-      VaadinSession session;
-//    VaadinRequest request;
-//    VaadinResponse response;
+    VaadinSession vaadinSession = UI.getCurrent().getSession();
+    WrappedSession wrappedSession;
+
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public Login() {
 
     }
 
-
-
     @PostConstruct
     public void init()
     {
-
-        List<User> users = new ArrayList<>();
-        users=(List)userService.getAllUsers();
-
-        System.out.println(users);
+        wrappedSession = vaadinSession.getSession();
 
         loginButton.addClickListener(e -> isRegistered());
 
-        productsButton.setVisible(false);
+        //productsButton.setVisible(false);
 
-        add(userName, password, loginButton, productsButton);
+        add(userName, password, loginButton);
     }
 
     private void isRegistered() {
-        System.out.println("Here");
-
-        System.out.println("Session: " + UI.getCurrent().getSession());
-
         user = userService.findByUserName(userName.getValue());
 
         if ("admin".equals(userName.getValue()) && "admin".equals(password.getValue())) {
             isAdmin = true;
-            productsButton.setVisible(true);
 
-            productsButton.addClickListener(event -> {
-                productsButton.getUI().ifPresent(ui -> ui.navigate("admin"));
-            });
+            wrappedSession.setAttribute("username", userName.getValue());
+
+            loginButton.getUI().ifPresent(ui -> ui.navigate("admin"));
+//            productsButton.addClickListener(event -> {
+//                productsButton.getUI().ifPresent(ui -> ui.navigate("admin"));
+//            });
         } else if (user != null) {
-            if (user.getUserName().equals(userName.getValue()) && user.getPassword().equals(password.getValue())) {
-                System.out.println("Nice");
-                System.out.println(user.getFirstName() + user.getLastName() + user.getUserName() + user.getPassword());
-                System.out.println(userName.getValue() + password.getValue());
-                UI.getCurrent().getSession().setAttribute("username", userName.getValue());
-                //session.setAttribute("password", password.getValue());
-                System.out.println("Session attribute: " + UI.getCurrent().getSession().getAttribute("username"));
-                productsButton.setVisible(true);
+            if (user.getUserName().equals(userName.getValue()) && passwordEncoder.matches(password.getValue(), user.getPassword())) {
+                wrappedSession.setAttribute("username", userName.getValue());
 
                 notification.open();
 
-                productsButton.addClickListener(event -> {
-                    productsButton.getUI().ifPresent(ui -> ui.navigate("products"));
-                });
-                //String sessionID = ((VaadinServletRequest) VaadinService.getCurrentRequest())
-                //.getHttpServletRequest().getSession().getId();
+                loginButton.getUI().ifPresent(ui -> ui.navigate("products"));
+            } else {
+                notification2.open();
             }
         } else {
-            System.out.println("Nope");
-
             notification2.open();
         }
     }

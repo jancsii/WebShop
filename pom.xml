@@ -76,6 +76,11 @@
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-notification-flow</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-push</artifactId>
+            <version>8.6.4</version>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>

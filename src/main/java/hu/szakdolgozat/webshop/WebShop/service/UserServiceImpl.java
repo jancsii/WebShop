@@ -7,8 +7,7 @@ import hu.szakdolgozat.webshop.WebShop.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@SpringComponent
-@UIScope
+
 @Service
 public class UserServiceImpl implements UserService{
 

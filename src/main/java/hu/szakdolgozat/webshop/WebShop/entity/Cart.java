@@ -3,6 +3,7 @@ package hu.szakdolgozat.webshop.WebShop.entity;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "cart")
 public class Cart {
 
     @Id

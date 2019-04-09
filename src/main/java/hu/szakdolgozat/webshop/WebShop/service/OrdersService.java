@@ -6,4 +6,5 @@ public interface OrdersService {
 
     Iterable<Orders> getAllOrders();
     Orders getOrders(int id);
+    void save(Orders orders);
 }

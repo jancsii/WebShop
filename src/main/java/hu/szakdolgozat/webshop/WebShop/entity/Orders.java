@@ -1,7 +1,6 @@
 package hu.szakdolgozat.webshop.WebShop.entity;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
 public class Orders {
@@ -15,7 +14,7 @@ public class Orders {
     @Column(name = "product_id")
     private int productId;
     @Column(name = "date")
-    private Date date;
+    private String date;
 
     public Orders() {}
 
@@ -43,11 +42,11 @@ public class Orders {
         this.productId = productId;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 }

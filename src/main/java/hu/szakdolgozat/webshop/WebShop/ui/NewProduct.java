@@ -8,10 +8,13 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.server.WrappedSession;
 import hu.szakdolgozat.webshop.WebShop.entity.Product;
 import hu.szakdolgozat.webshop.WebShop.service.ProductService;
 import hu.szakdolgozat.webshop.WebShop.validation.NewProductValidation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -42,6 +45,9 @@ public class NewProduct extends VerticalLayout {
     private Label productDescriptionLabel = new Label("Product Description: ");
     private Label errorLabel = new Label();
     private Product product = new Product();
+
+    VaadinSession session = UI.getCurrent().getSession();
+    WrappedSession wrappedSession;
     UI ui;
 
     public NewProduct() {
@@ -79,25 +85,31 @@ public class NewProduct extends VerticalLayout {
     @PostConstruct
     public void init()
     {
-        products.addClickListener( event-> {
-            products.getUI().ifPresent(ui -> ui.navigate("admin"));
-        });
+        wrappedSession = session.getSession();
 
-        productName.setMaxLength(50);
-        productImage.setMaxLength(150);
-        productCategory.setMaxLength(50);
-        productDescription.setMaxLength(250);
+        if("admin".equals(wrappedSession.getAttribute("username"))) {
+            products.addClickListener(event -> {
+                products.getUI().ifPresent(ui -> ui.navigate("admin"));
+            });
 
+            productName.setMaxLength(50);
+            productImage.setMaxLength(150);
+            productCategory.setMaxLength(50);
+            productDescription.setMaxLength(250);
 
-        add(products);
+            add(products);
 
-        settingComponents();
+            settingComponents();
 
-        add(add);
+            add(add);
 
-        errorLabel.getStyle().set("color", "red");
+            errorLabel.getStyle().set("color", "red");
 
-        add(errorLabel);
+            add(errorLabel);
+        } else {
+            UI.getCurrent().navigate("");
+            UI.getCurrent().getPage().executeJavaScript("location.reload();");
+        }
     }
 
     private String joiningErrors(ArrayList<String> errors) {
@@ -105,7 +117,6 @@ public class NewProduct extends VerticalLayout {
         String errorContainer = String.join("\n", errors);
 
         return errorContainer;
-
     }
 
     public void settingComponents() {
@@ -152,6 +163,5 @@ public class NewProduct extends VerticalLayout {
 
         add(horizontalLayoutName, horizontalLayoutImage, horizontalLayoutCategory, horizontalLayoutPrice,
                 horizontalLayoutQuantity, horizontalLayoutDescription);
-
     }
 }

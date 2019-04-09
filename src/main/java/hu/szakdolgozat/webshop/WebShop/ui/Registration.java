@@ -7,6 +7,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.NativeButton;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -17,11 +18,17 @@ import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.spring.annotation.EnableVaadin;
+import com.vaadin.flow.spring.annotation.UIScope;
 import hu.szakdolgozat.webshop.WebShop.entity.User;
 import hu.szakdolgozat.webshop.WebShop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,11 +38,7 @@ public class Registration extends VerticalLayout {
     @Autowired
     UserService userService;
 
-    //private TextField name = new TextField("Name");
-    //private PasswordField password = new PasswordField("Password");
-    //private TextField address = new TextField("Address");
-    //private TextField email = new TextField("Email");
-    //private User user = new User();
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     FormLayout layoutWithBinder = new FormLayout();
     private TextField firstName = new TextField();
@@ -50,6 +53,10 @@ public class Registration extends VerticalLayout {
     NativeButton button = new NativeButton("Login");
     private User user = new User();
     HorizontalLayout actions = new HorizontalLayout();
+    private boolean isAlreadyRegistered = false;
+
+    Notification registrationNotification = new Notification(
+            "Username already exists!", 2000, Notification.Position.TOP_CENTER);
 
     public Registration() {
 
@@ -110,22 +117,37 @@ public class Registration extends VerticalLayout {
                 .bind(User::getEmail, User::setEmail);
         binder.forField(address)
                 .withValidator(new StringLengthValidator(
-                        "Incorrect address",10,50))
+                        "Incorrect address(Min length:10)",10,50))
                 .bind(User::getAddress, User::setAddress);
 
         //save.addClickListener(event -> userService.save(user));
         save.addClickListener(event -> {
-            if (binder.writeBeanIfValid(user)) {
-                infoLabel.setText("Saved bean values: " + user);
-                userService.save(user);
-            } else {
-                BinderValidationStatus<User> validate = binder.validate();
-                String errorText = validate.getFieldValidationStatuses()
-                        .stream().filter(BindingValidationStatus::isError)
-                        .map(BindingValidationStatus::getMessage)
-                        .map(Optional::get).distinct()
-                        .collect(Collectors.joining(", "));
-                infoLabel.setText("There are errors: " + errorText);
+            ArrayList<User> users = (ArrayList<User>) userService.getAllUsers();
+            for(int i=0; i<users.size(); i++)
+            {
+                if(userName.getValue().trim().equals(users.get(i).getUserName()))
+                    isAlreadyRegistered = true;
+            }
+
+            if(!isAlreadyRegistered) {
+                if (binder.writeBeanIfValid(user)) {
+                    infoLabel.setText("Saved bean values: " + user);
+                    user.setPassword(passwordEncoder.encode(password.getValue()));
+                    user.setUserName(userName.getValue().trim());
+                    userService.save(user);
+                } else {
+                    BinderValidationStatus<User> validate = binder.validate();
+                    String errorText = validate.getFieldValidationStatuses()
+                            .stream().filter(BindingValidationStatus::isError)
+                            .map(BindingValidationStatus::getMessage)
+                            .map(Optional::get).distinct()
+                            .collect(Collectors.joining(", "));
+                    infoLabel.setText("There are errors: " + errorText);
+                }
+            }
+            else {
+                registrationNotification.open();
+                isAlreadyRegistered = false;
             }
         });
 

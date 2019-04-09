@@ -9,8 +9,7 @@ import hu.szakdolgozat.webshop.WebShop.entity.Product;
 
 import java.util.Optional;
 
-@SpringComponent
-@UIScope
+
 @Service
 public class ProductServiceImpl implements ProductService{
 

@@ -5,47 +5,53 @@ import com.vaadin.flow.component.board.Board;
 import com.vaadin.flow.component.board.Row;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinService;
+import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.server.WrappedSession;
+import com.vaadin.flow.spring.annotation.UIScope;
 import hu.szakdolgozat.webshop.WebShop.entity.Product;
 import hu.szakdolgozat.webshop.WebShop.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.EventObject;
 
 @Route("admin")
-public class Admin extends VerticalLayout implements BeforeEnterObserver {
+public class Admin extends VerticalLayout  {
 
     @Autowired
     ProductService productService;
 
     private Button newProduct = new Button("Adding new product");
 
+    //VaadinSession session = VaadinSession.getCurrent();
+    //VaadinSession session2 = new VaadinSession(VaadinService.getCurrent());
+    VaadinSession session = UI.getCurrent().getSession();
+    WrappedSession wrappedSession;
+
     @PostConstruct
     public void init()
     {
-        if("admin".equals(UI.getCurrent().getSession().getAttribute("username"))) {
-            ArrayList<Product> products = (ArrayList<Product>) productService.getAllProducts();
+        wrappedSession = session.getSession();
 
+        if("admin".equals(wrappedSession.getAttribute("username"))) {
+            ArrayList<Product> products = (ArrayList<Product>) productService.getAllProducts();
             listingProducts(products);
 
             newProduct.addClickListener( event-> {
                 newProduct.getUI().ifPresent(ui -> ui.navigate("admin/newproduct"));
             });
         } else {
-            getUI().ifPresent(ui -> ui.navigate("login"));
+            UI.getCurrent().navigate("");
+            UI.getCurrent().getPage().executeJavaScript("location.reload();");
         }
 
-    }
-
-    @Override
-    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        if (!"admin".equals(UI.getCurrent().getSession().getAttribute("username"))) {
-            beforeEnterEvent.rerouteTo("login");
-        }
     }
 
     public void listingProducts(ArrayList<Product> products) {
