@@ -1,12 +1,8 @@
 package hu.szakdolgozat.webshop.WebShop.ui;
 
-import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.html.NativeButton;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -16,23 +12,24 @@ import com.vaadin.flow.data.binder.*;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.spring.annotation.EnableVaadin;
 import com.vaadin.flow.spring.annotation.UIScope;
+import com.vaadin.flow.theme.Theme;
+import com.vaadin.flow.theme.lumo.Lumo;
+import hu.szakdolgozat.webshop.WebShop.Names;
 import hu.szakdolgozat.webshop.WebShop.entity.User;
 import hu.szakdolgozat.webshop.WebShop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Route("")
+@Route(Names.REGISTRATION)
+@Theme(value = Lumo.class, variant = Lumo.DARK)
+@UIScope
 public class Registration extends VerticalLayout {
 
     @Autowired
@@ -48,10 +45,11 @@ public class Registration extends VerticalLayout {
     private TextField address = new TextField();
     private TextField email = new TextField();
     Label infoLabel = new Label();
-    Button save = new Button("Save");
+    Button save = new Button("Sign up");
     Button reset = new Button("Reset");
-    NativeButton button = new NativeButton("Login");
+    Button login = new Button("Login");
     private User user = new User();
+    HorizontalLayout form = new HorizontalLayout();
     HorizontalLayout actions = new HorizontalLayout();
     private boolean isAlreadyRegistered = false;
 
@@ -59,7 +57,12 @@ public class Registration extends VerticalLayout {
             "Username already exists!", 2000, Notification.Position.TOP_CENTER);
 
     public Registration() {
+    }
 
+    @PostConstruct
+    public void init() {
+
+        firstName.focus();
         Binder<User> binder = new BeanValidationBinder<>(User.class);  //new Binder<>();
         binder.bindInstanceFields(this);
         binder.setBean(user);
@@ -84,9 +87,6 @@ public class Registration extends VerticalLayout {
         layoutWithBinder.addFormItem(password, "Password");
         layoutWithBinder.addFormItem(address, "Address");
         layoutWithBinder.addFormItem(email, "E-mail");
-
-        save.getElement().setAttribute("theme", "primary");
-        actions.add(save, reset);
 
         firstName.setRequiredIndicatorVisible(true);
         lastName.setRequiredIndicatorVisible(true);
@@ -131,7 +131,7 @@ public class Registration extends VerticalLayout {
 
             if(!isAlreadyRegistered) {
                 if (binder.writeBeanIfValid(user)) {
-                    infoLabel.setText("Saved bean values: " + user);
+                    infoLabel.setText("Thank you for sign up");
                     user.setPassword(passwordEncoder.encode(password.getValue()));
                     user.setUserName(userName.getValue().trim());
                     userService.save(user);
@@ -156,10 +156,33 @@ public class Registration extends VerticalLayout {
             infoLabel.setText("");
         });
 
-        button.addClickListener( e-> {
-                    button.getUI().ifPresent(ui -> ui.navigate("login"));
-                });
+        login.addClickListener( e-> {
+            login.getUI().ifPresent(ui -> ui.navigate(Names.LOGIN));
+        });
 
-        add(layoutWithBinder, infoLabel, actions, button);
+        form.add(layoutWithBinder);
+
+        style();
+
+        add(form, infoLabel, reset, actions);
+    }
+
+    public void style() {
+        this.getStyle().set("width", "700px");
+        this.getStyle().set("margin", "0px auto");
+
+        save.getElement().setAttribute("theme", "primary");
+        login.getElement().setAttribute("theme", "primary");
+
+        //infoLabel.getStyle().set("margin-left", "50px");
+        infoLabel.getStyle().set("width", "650px");
+        infoLabel.getStyle().set("color", "#F6544C");
+        reset.getStyle().set("margin-left", "595px");
+        save.getStyle().set("margin-right", "30px");
+
+        form.getStyle().set("margin-top", "40px");
+
+        actions.add(save, login);
+        actions.getStyle().set("margin", "40px 0px 0px 285px");
     }
 }

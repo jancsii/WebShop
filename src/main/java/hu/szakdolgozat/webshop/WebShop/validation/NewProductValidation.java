@@ -8,7 +8,7 @@ public class NewProductValidation {
 
     public NewProductValidation() {}
 
-    public ArrayList<String> productNameValidation(String productName, String productImage, String productCategory,
+    public ArrayList<String> newProductValidation(String productName, String productImage, String productCategory,
                                                    String productPrice, String productQuantity, String productDescription) {
         if (!(productName.trim().length() > 0) || !(productName.trim().length() <= 50))
             errors.add("Name must be between 1 and 50 characters long!");
@@ -37,4 +37,11 @@ public class NewProductValidation {
         return errors;
     }
 
+    public boolean productModify(String productData, int minL, int maxL) {
+        return (productData.trim().length() > minL && productData.trim().length() < maxL) ? true : false;
+    }
+
+    public boolean productModifyNum(String productData) {
+        return (productData.trim().length() > 0 && productData.matches("[0-9]+")) ? true : false;
+    }
 }

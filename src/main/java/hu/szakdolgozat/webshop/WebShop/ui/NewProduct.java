@@ -3,6 +3,7 @@ package hu.szakdolgozat.webshop.WebShop.ui;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -10,18 +11,19 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.WrappedSession;
+import com.vaadin.flow.theme.Theme;
+import com.vaadin.flow.theme.lumo.Lumo;
+import hu.szakdolgozat.webshop.WebShop.Names;
 import hu.szakdolgozat.webshop.WebShop.entity.Product;
 import hu.szakdolgozat.webshop.WebShop.service.ProductService;
 import hu.szakdolgozat.webshop.WebShop.validation.NewProductValidation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
-@Route("admin/newproduct")
+@Route(Names.NEWPRODUCT)
+@Theme(value = Lumo.class, variant = Lumo.DARK)
 public class NewProduct extends VerticalLayout {
 
     @Autowired
@@ -46,18 +48,27 @@ public class NewProduct extends VerticalLayout {
     private Label errorLabel = new Label();
     private Product product = new Product();
 
+    Notification wrong = new Notification(
+            "Something is wrong!", 2000, Notification.Position.TOP_CENTER);
+    Notification saved = new Notification(
+            "Successfully saved!", 2000, Notification.Position.TOP_CENTER);
+
     VaadinSession session = UI.getCurrent().getSession();
     WrappedSession wrappedSession;
     UI ui;
 
     public NewProduct() {
+    }
+
+    @PostConstruct
+    public void init()
+    {
+        wrappedSession = session.getSession();
 
         add.addClickListener( event -> {
-            ArrayList<String> errors = newProductValidation.productNameValidation(productName.getValue(),
+            ArrayList<String> errors = newProductValidation.newProductValidation(productName.getValue(),
                     productImage.getValue(), productCategory.getValue(), productPrice.getValue(),
                     productQuantity.getValue(), productDescription.getValue());
-
-            System.out.println("Errors: " + errors);
 
             if(!(errors.isEmpty())) {
 
@@ -65,9 +76,9 @@ public class NewProduct extends VerticalLayout {
                 errorLabel.setText(joiningErrors(errors));
 
                 errors.clear();
+                wrong.open();
 
             } else {
-                //errorLabel.setText("");
                 errorLabel.setVisible(false);
                 product.setName(productName.getValue());
                 product.setImage(productImage.getValue());
@@ -76,20 +87,15 @@ public class NewProduct extends VerticalLayout {
                 product.setQuantity(Integer.parseInt(productQuantity.getValue()));
                 product.setDescription(productDescription.getValue());
                 productService.save(product);
-                System.out.println(product);
+                saved.open();
+                UI.getCurrent().getPage().reload();
             }
 
         });
-    }
 
-    @PostConstruct
-    public void init()
-    {
-        wrappedSession = session.getSession();
-
-        if("admin".equals(wrappedSession.getAttribute("username"))) {
+        if(Names.ADMIN.equals(wrappedSession.getAttribute(Names.USERNAME))) {
             products.addClickListener(event -> {
-                products.getUI().ifPresent(ui -> ui.navigate("admin"));
+                products.getUI().ifPresent(ui -> ui.navigate(Names.ADMIN));
             });
 
             productName.setMaxLength(50);
@@ -103,11 +109,11 @@ public class NewProduct extends VerticalLayout {
 
             add(add);
 
-            errorLabel.getStyle().set("color", "red");
+            errorLabel.getStyle().set("color", "#E58992");
 
             add(errorLabel);
         } else {
-            UI.getCurrent().navigate("");
+            UI.getCurrent().navigate(Names.DENIED);
             UI.getCurrent().getPage().executeJavaScript("location.reload();");
         }
     }
@@ -121,6 +127,9 @@ public class NewProduct extends VerticalLayout {
 
     public void settingComponents() {
 
+        products.getStyle().set("margin", "25px 0px 20px 80px");
+        add.getStyle().set("margin", "15px 0px 0px 397px");
+
         HorizontalLayout horizontalLayoutName = new HorizontalLayout();
         HorizontalLayout horizontalLayoutImage = new HorizontalLayout();
         HorizontalLayout horizontalLayoutCategory = new HorizontalLayout();
@@ -131,33 +140,46 @@ public class NewProduct extends VerticalLayout {
         productNameLabel.getStyle().set("width", "170px");
         productNameLabel.getStyle().set("vertical-align", "center");
         productNameLabel.getStyle().set("margin-left", "100px");
+        productNameLabel.getStyle().set("color", "#53A8FF");
+        productName.getStyle().set("color", "#53A8FF");
         productName.getStyle().set("width", "200px");
         horizontalLayoutName.add(productNameLabel, productName);
 
         productImageLabel.getStyle().set("width", "170px");
         productImageLabel.getStyle().set("vertical-align", "center");
         productImageLabel.getStyle().set("margin-left", "100px");
+        productImageLabel.getStyle().set("color", "#53A8FF");
+        productImage.getStyle().set("color", "#53A8FF");
         productImage.getStyle().set("width", "200px");
         horizontalLayoutImage.add(productImageLabel, productImage);
 
         productCategoryLabel.getStyle().set("width", "170px");
         productCategoryLabel.getStyle().set("margin-left", "100px");
+        productCategoryLabel.getStyle().set("color", "#53A8FF");
+        productCategory.getStyle().set("color", "#53A8FF");
         productCategory.getStyle().set("width", "200px");
         horizontalLayoutCategory.add(productCategoryLabel, productCategory);
 
         productPriceLabel.getStyle().set("width", "170px");
         productPriceLabel.getStyle().set("margin-left", "100px");
+        productPriceLabel.getStyle().set("color", "#53A8FF");
+        productPrice.getStyle().set("color", "#53A8FF");
         productPrice.getStyle().set("width", "200px");
         horizontalLayoutPrice.add(productPriceLabel, productPrice);
 
         productQuantityLabel.getStyle().set("width", "170px");
         productQuantityLabel.getStyle().set("margin-left", "100px");
+        productQuantityLabel.getStyle().set("color", "#53A8FF");
+        productQuantity.getStyle().set("color", "#53A8FF");
         productQuantity.getStyle().set("width", "200px");
         horizontalLayoutQuantity.add(productQuantityLabel, productQuantity);
 
         productDescriptionLabel.getStyle().set("width", "170px");
         productDescriptionLabel.getStyle().set("margin-left", "100px");
+        productDescriptionLabel.getStyle().set("color", "#53A8FF");
+        productDescription.getStyle().set("color", "#53A8FF");
         productDescription.getStyle().set("width", "200px");
+        productDescription.getStyle().set("height", "70px");
         horizontalLayoutDescription.add(productDescriptionLabel, productDescription);
 
 

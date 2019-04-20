@@ -9,4 +9,5 @@ public interface UserService {
     Iterable<User> getAllUsers();
     User findByFirstName(String name);
     User findByUserName(String name);
+    User getUser(int id);
 }

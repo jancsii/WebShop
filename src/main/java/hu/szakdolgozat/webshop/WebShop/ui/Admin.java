@@ -4,51 +4,86 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.board.Board;
 import com.vaadin.flow.component.board.Row;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Page;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.WrappedSession;
 import com.vaadin.flow.spring.annotation.UIScope;
+import com.vaadin.flow.theme.Theme;
+import com.vaadin.flow.theme.lumo.Lumo;
+import hu.szakdolgozat.webshop.WebShop.Names;
 import hu.szakdolgozat.webshop.WebShop.entity.Product;
 import hu.szakdolgozat.webshop.WebShop.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.EventObject;
 
-@Route("admin")
+@Route(Names.ADMIN)
+@Theme(value = Lumo.class, variant = Lumo.DARK)
+@UIScope
 public class Admin extends VerticalLayout  {
 
     @Autowired
     ProductService productService;
 
     private Button newProduct = new Button("Adding new product");
+    private Button watchProducts = new Button("Watch all products");
+    private Label productNameLabel = new Label("Name: ");
+    private Label productImageLabel = new Label("Image: ");
+    private Label productCategoryLabel = new Label("Category: ");
+    private Label productPriceLabel = new Label("Price: ");
+    private Label productQuantityLabel = new Label("Quantity: ");
+    private Label productDescriptionLabel = new Label("Description: ");
+    VerticalLayout vl = new VerticalLayout();
+    HorizontalLayout hl = new HorizontalLayout();
+    HorizontalLayout buttons = new HorizontalLayout();
 
-    //VaadinSession session = VaadinSession.getCurrent();
-    //VaadinSession session2 = new VaadinSession(VaadinService.getCurrent());
     VaadinSession session = UI.getCurrent().getSession();
     WrappedSession wrappedSession;
 
     @PostConstruct
     public void init()
     {
+        //this.getStyle().set("width", "1111px");
+        this.getStyle().set("padding", "0px");
+        this.getStyle().set("background-color", "#233348");
+        buttons.add(newProduct, watchProducts);
+        buttons.getStyle().set("margin", "0px 0px 0px 12px");
+        newProduct.getStyle().set("margin", "0px 0px 10px 150px");
+        watchProducts.getStyle().set("margin", "0px 0px 10px 15px");
         wrappedSession = session.getSession();
 
-        if("admin".equals(wrappedSession.getAttribute("username"))) {
+        vl.add(productNameLabel, productImageLabel, productCategoryLabel, productPriceLabel, productQuantityLabel,
+                productDescriptionLabel);
+
+        vl.getStyle().set("width", "90px");
+        hl.setWidth("96%");
+        hl.getStyle().set("margin", "0 auto");
+        productNameLabel.getStyle().set("color", "#53A8FF");
+        productImageLabel.getStyle().set("color", "#53A8FF");
+        productCategoryLabel.getStyle().set("color", "#53A8FF");
+        productPriceLabel.getStyle().set("color", "#53A8FF");
+        productQuantityLabel.getStyle().set("color", "#53A8FF");
+        productDescriptionLabel.getStyle().set("color", "#53A8FF");
+        productNameLabel.getStyle().set("margin", "51px 0px 0px 0px");
+        productImageLabel.getStyle().set("margin", "16px 0px 0px 0px");
+        productCategoryLabel.getStyle().set("margin", "17px 0px 0px 0px");
+        productPriceLabel.getStyle().set("margin", "19px 0px 0px 0px");
+        productQuantityLabel.getStyle().set("margin", "20px 0px 0px 0px");
+        productDescriptionLabel.getStyle().set("margin", "21px 0px 0px 0px");
+
+        if(Names.ADMIN.equals(wrappedSession.getAttribute(Names.USERNAME))) {
             ArrayList<Product> products = (ArrayList<Product>) productService.getAllProducts();
             listingProducts(products);
 
-            newProduct.addClickListener( event-> {
-                newProduct.getUI().ifPresent(ui -> ui.navigate("admin/newproduct"));
-            });
+            newProduct.addClickListener( event-> newProduct.getUI().ifPresent(ui -> ui.navigate(Names.NEWPRODUCT)));
+
+            watchProducts.addClickListener( event -> watchProducts.getUI().ifPresent(ui -> ui.navigate(Names.PRODUCTS)));
         } else {
-            UI.getCurrent().navigate("");
+            UI.getCurrent().navigate(Names.DENIED);
             UI.getCurrent().getPage().executeJavaScript("location.reload();");
         }
 
@@ -70,13 +105,11 @@ public class Admin extends VerticalLayout  {
             //ColumnLay columnLay = new ColumnLay(products.get(i).getName(), "frontend/images/" +
             //        products.get(i).getImage(), products.get(i).getPrice(), products.get(i).getQuantity());
             storingTemp.add(columnLay);
-            System.out.println("This: " + this);
 
             if(storingTemp.size()==4)
             {
                 board.addRow(storingTemp.get(0), storingTemp.get(1), storingTemp.get(2), storingTemp.get(3));
-                board.getStyle().set("margin-left", "200px");
-                board.setWidth("70%");
+                board.getStyle().set("margin", "35px 0px 0px 10px");
                 storingTemp.clear();
             }
         }
@@ -86,19 +119,17 @@ public class Admin extends VerticalLayout  {
             row.setComponentSpan(storingTemp.get(0),1);
             row.setComponentSpan(storingTemp.get(1),1);
             row.setComponentSpan(storingTemp.get(2),2);
-        }
-        else if(storingTemp.size()==2){
+        } else if(storingTemp.size()==2){
             Row row = board.addRow(storingTemp.get(0), storingTemp.get(1));
             row.setComponentSpan(storingTemp.get(0),1);
             row.setComponentSpan(storingTemp.get(1),3);
-        }
-        else if(storingTemp.size()==1){
+        } else if(storingTemp.size()==1){
             Row row = board.addRow(storingTemp.get(0));
             row.setComponentSpan(storingTemp.get(0),1);
         }
 
-
-        add(board);
-        add(newProduct);
+        hl.add(vl, board);
+        add(hl);
+        add(buttons);
     }
 }
