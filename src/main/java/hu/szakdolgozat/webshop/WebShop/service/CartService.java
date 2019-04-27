@@ -1,8 +1,6 @@
 package hu.szakdolgozat.webshop.WebShop.service;
 
 import hu.szakdolgozat.webshop.WebShop.entity.Cart;
-import org.springframework.stereotype.Service;
-
 
 public interface CartService {
 

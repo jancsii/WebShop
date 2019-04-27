@@ -55,7 +55,6 @@ public class NewProduct extends VerticalLayout {
 
     VaadinSession session = UI.getCurrent().getSession();
     WrappedSession wrappedSession;
-    UI ui;
 
     public NewProduct() {
     }

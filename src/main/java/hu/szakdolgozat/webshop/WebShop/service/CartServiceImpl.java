@@ -1,11 +1,8 @@
 package hu.szakdolgozat.webshop.WebShop.service;
 
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
 import hu.szakdolgozat.webshop.WebShop.entity.Cart;
 import hu.szakdolgozat.webshop.WebShop.repository.CartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -264,9 +264,7 @@ public class ColumnLay extends VerticalLayout {
         this.image.add(img);
         this.image.getStyle().set("margin-left", "32px");
         this.price.setText(price);
-        //this.price.setText(String.valueOf(price) + "€");
         this.quantity.setText(quantity);
-        //this.quantity.setText(String.valueOf(quantity));
         this.quantity.getStyle().set("margin-left", "120px");
         this.purchaseContainer.add(this.name, this.image, this.price, this.quantity);
         this.purchaseContainer.getStyle().set("width", "250px");
@@ -330,12 +328,52 @@ public class ColumnLay extends VerticalLayout {
         this.purchaseContainer.getStyle().set("background-color", "#696969");
         this.purchaseContainer.getStyle().set("border-radius", "20px");
         this.purchaseContainer.getStyle().set("margin", "15px 0px 0px 25px");
+        this.getStyle().set("position", "relative");
 
         vimagedesc.add(this.image, this.description);
         vdatas.add(this.price, this.category);
         vbuttons.add(this.buy, this.delete);
 
         this.purchaseContainer.add(this.name, this.vimagedesc, this.vdatas, this.vbuttons);
+
+        add(this.purchaseContainer);
+    }
+
+    public ColumnLay(String name, String category, String image, int price, String description,
+                     int productId, int userId, int cartId) {
+        this.name.setText(name);
+        Image img = new Image("frontend/images/" + image, "Cant display the image!");
+        img.getStyle().set("border-radius", "10px");
+        img.getStyle().set("margin-top", "5px");
+        img.setWidth("185px");
+        img.setHeight("110px");
+        this.image.add(img);
+        this.image.getStyle().set("margin-left", "32px");
+        this.price.setText("€" + String.valueOf(price));
+        this.category.setText(category);
+        this.description.setText(description);
+
+        this.name.getStyle().set("margin", "14px 0px 0px 17px");
+        this.name.getStyle().set("color", "#233348");
+        this.category.getStyle().set("margin", "0px 0px 0px 72px");
+        this.price.getStyle().set("color", "#233348");
+        this.quantity.getStyle().set("color", "#233348");
+        this.category.getStyle().set("color", "#233348");
+        this.description.getStyle().set("color", "#233348");
+        this.price.getStyle().set("margin-left", "30px");
+        this.quantity.getStyle().set("margin-left", "111px");
+        this.price.getStyle().set("font-weight", "bold");
+        this.vbuttons.getStyle().set("margin", "0px 0px 15px 315px");
+        this.purchaseContainer.getStyle().set("width", "500px");
+        this.purchaseContainer.getStyle().set("background-color", "#696969");
+        this.purchaseContainer.getStyle().set("border-radius", "20px");
+        this.purchaseContainer.getStyle().set("margin", "15px 0px 0px 25px");
+        this.getStyle().set("position", "relative");
+
+        vimagedesc.add(this.image, this.description);
+        vdatas.add(this.price, this.category);
+
+        this.purchaseContainer.add(this.name, this.vimagedesc, this.vdatas);
 
         add(this.purchaseContainer);
     }

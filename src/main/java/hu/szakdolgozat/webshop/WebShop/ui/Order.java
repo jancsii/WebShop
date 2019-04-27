@@ -4,21 +4,24 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.board.Board;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.router.Route;
-
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.WrappedSession;
+import com.vaadin.flow.shared.communication.PushMode;
 import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 import hu.szakdolgozat.webshop.WebShop.ApplicationContextHolder;
 import hu.szakdolgozat.webshop.WebShop.Names;
 import hu.szakdolgozat.webshop.WebShop.entity.Cart;
+import hu.szakdolgozat.webshop.WebShop.entity.Orders;
 import hu.szakdolgozat.webshop.WebShop.entity.User;
 import hu.szakdolgozat.webshop.WebShop.service.CartService;
+import hu.szakdolgozat.webshop.WebShop.service.OrdersService;
 import hu.szakdolgozat.webshop.WebShop.service.ProductService;
 import hu.szakdolgozat.webshop.WebShop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +29,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 
-@Route(Names.PURCHASE)
+@Route(Names.ORDERS)
 @Theme(value = Lumo.class, variant = Lumo.DARK)
+@Push(PushMode.MANUAL)
 @UIScope
-public class Purchase extends VerticalLayout{
+public class Order extends VerticalLayout {
 
+    OrdersService ordersService = ApplicationContextHolder.getContext().getBean(OrdersService.class);
 
     CartService cartService = ApplicationContextHolder.getContext().getBean(CartService.class);
 
@@ -40,17 +45,20 @@ public class Purchase extends VerticalLayout{
     @Autowired
     ProductService productService;
 
-    private Label empty = new Label("The cart is empty!");
+    private Label empty = new Label("You have not bought anything yet!");
+    private Label previous = new Label("Your previous purchases:");
     private ArrayList<String> container = new ArrayList<>();
     private Board containerBoard = new Board();
     private VerticalLayout verticalLayout = new VerticalLayout();
+    private ArrayList<Orders> orderContent = new ArrayList<>();
     private ArrayList<Cart> cartContent = new ArrayList<>();
     private Label counter = new Label("0");
     int count = 0;
+    int countCart = 0;
     VaadinSession session = UI.getCurrent().getSession();
     WrappedSession wrappedSession;
 
-    public Purchase() {
+    public void Orders() {
     }
 
     @PostConstruct
@@ -72,7 +80,7 @@ public class Purchase extends VerticalLayout{
 
     public void counterInc()
     {
-        counter.setText(String.valueOf(count));
+        counter.setText(String.valueOf(countCart));
     }
 
     public void listPurchasedElements() {
@@ -80,26 +88,33 @@ public class Purchase extends VerticalLayout{
         User user = userService.findByUserName(wrappedSession.getAttribute(Names.USERNAME).toString());
 
         try {
-            if(cartService.getAllCart() != null) {
+            if(ordersService.getAllOrders() != null) {
                 remove(empty);
+                add(previous);
                 remove(containerBoard);
+                orderContent = (ArrayList<Orders>) ordersService.getAllOrders();
                 cartContent = (ArrayList<Cart>) cartService.getAllCart();
-                for(int i=0; i<cartContent.size(); i++) {
-                    if(cartContent.get(i).getUserId() == user.getId()) {
-                        ColumnLay columnLay = new ColumnLay(productService.getProduct(cartContent.get(i).getProductId()).getName(),
-                                productService.getProduct(cartContent.get(i).getProductId()).getCategory(),
-                                productService.getProduct(cartContent.get(i).getProductId()).getPrice(),
-                                productService.getProduct(cartContent.get(i).getProductId()).getImage(),
-                                productService.getProduct(cartContent.get(i).getProductId()).getQuantity(),
-                                productService.getProduct(cartContent.get(i).getProductId()).getDescription(),
-                                productService.getProduct(cartContent.get(i).getProductId()).getId(),
-                                user.getId(), cartContent.get(i).getId());
+                for(int i=0; i<orderContent.size(); i++) {
+                    if(orderContent.get(i).getUserId() == user.getId()) {
+                        ColumnLay columnLay = new ColumnLay(productService.getProduct(orderContent.get(i).getProductId()).getName(),
+                                productService.getProduct(orderContent.get(i).getProductId()).getCategory(),
+                                productService.getProduct(orderContent.get(i).getProductId()).getImage(),
+                                productService.getProduct(orderContent.get(i).getProductId()).getPrice(),
+                                productService.getProduct(orderContent.get(i).getProductId()).getDescription(),
+                                productService.getProduct(orderContent.get(i).getProductId()).getId(),
+                                user.getId(), orderContent.get(i).getId());
                         containerBoard.addRow(columnLay);
                         count++;
                     }
                 }
+                for(int i=0; i<cartContent.size(); i++) {
+                    if(cartContent.get(i).getUserId() == user.getId()) {
+                        countCart++;
+                    }
+                }
             }
             if(count == 0) {
+                remove(previous);
                 add(empty);
             }
         } catch(Exception e) {
@@ -119,8 +134,8 @@ public class Purchase extends VerticalLayout{
 
         Button prod = new Button("Products");
         horizontalLayout.add(prod);
-        Button orders = new Button("Orders");
-        horizontalLayout.add(orders);
+        Button cart = new Button("Cart");
+        horizontalLayout.add(cart);
         Button logout = new Button("Logout");
         horizontalLayout.add(logout);
 
@@ -136,13 +151,13 @@ public class Purchase extends VerticalLayout{
 
         prod.addClickListener(event -> prod.getUI().ifPresent(ui -> ui.navigate(Names.PRODUCTS)));
 
-        orders.addClickListener(event -> orders.getUI().ifPresent(ui -> ui.navigate(Names.ORDERS)));
-
         logout.addClickListener( event-> {
             logout.getUI().ifPresent(ui -> ui.navigate(Names.LOGIN));
             wrappedSession.invalidate();
             session.close();
         });
+
+        cart.addClickListener(event -> cart.getUI().ifPresent(ui -> ui.navigate(Names.PURCHASE)));
 
         logout.getStyle().set("theme", "primary");
         logout.getStyle().set("margin", "auto 10px auto 10px");
@@ -150,9 +165,9 @@ public class Purchase extends VerticalLayout{
         prod.getStyle().set("theme", "primary");
         prod.getStyle().set("margin", "auto 10px auto 35px");
         prod.getStyle().set("color", "#233348");
-        orders.getStyle().set("theme", "primary");
-        orders.getStyle().set("margin", "auto 10px auto 10px");
-        orders.getStyle().set("color", "#233348");
+        cart.getStyle().set("theme", "primary");
+        cart.getStyle().set("margin", "auto 10px auto 10px");
+        cart.getStyle().set("color", "#233348");
         cartLogo.getStyle().set("margin", "19px 0px 16px 0px");
         cartLogo.getStyle().set("padding", "0px 0px 0px 0px");
         counter.getStyle().set("margin", "0px 0px 0px 0px");
@@ -165,6 +180,10 @@ public class Purchase extends VerticalLayout{
         empty.getStyle().set("font-size", "23px");
         empty.getStyle().set("margin", "25px 0px 0px 50px");
         empty.getStyle().set("color", "#696969");
+        previous.getStyle().set("font-weight", "bold");
+        previous.getStyle().set("font-size", "23px");
+        previous.getStyle().set("margin", "25px 0px 0px 50px");
+        previous.getStyle().set("color", "#696969");
         this.getStyle().set("background-color", "#233348");
 
         add(horizontalLayout);
@@ -179,7 +198,9 @@ public class Purchase extends VerticalLayout{
         horizontalLayout.getStyle().set("margin", "0 auto 0 18px");
         horizontalLayout.getStyle().set("background-color", "#696969");
         horizontalLayout.getStyle().set("position", "absolute");
+        horizontalLayout.getStyle().set("right", "0");
         horizontalLayout.getStyle().set("bottom", "0");
+        horizontalLayout.getStyle().set("left", "0");
         System.out.println();
         horizontalLayout.getStyle().set("border-top-right-radius", "10px");
         horizontalLayout.getStyle().set("border-top-left-radius", "10px");

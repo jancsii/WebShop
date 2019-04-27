@@ -1,14 +1,9 @@
 package hu.szakdolgozat.webshop.WebShop.service;
 
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
 import hu.szakdolgozat.webshop.WebShop.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import hu.szakdolgozat.webshop.WebShop.entity.Product;
-
-import java.util.Optional;
-
 
 @Service
 public class ProductServiceImpl implements ProductService{

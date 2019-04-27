@@ -58,8 +58,6 @@ public class Products extends VerticalLayout {
 
     Icon filterLogo = new Icon(VaadinIcon.FILTER);
     Button filterButton =new Button("", filterLogo);
-    private String isFilter = "";
-    UI ui = UI.getCurrent();
 
     Notification notification = new Notification(
             "Login to purchase!", 2000, Notification.Position.TOP_CENTER);
@@ -87,7 +85,6 @@ public class Products extends VerticalLayout {
                     count++;
                 }
             }
-            System.out.println("The count: " + count);
             counter.setText(String.valueOf(count));
         }
     }
@@ -95,9 +92,6 @@ public class Products extends VerticalLayout {
     @PostConstruct
     public void init()
     {
-//        UI.getCurrent().getPage().executeJavaScript(
-//                "getElementById('vaadin-license-validation-notification-vaadin-board')." +
-//                        "style['display'] = 'none');");
         menu();
 
         counterInc();
@@ -118,6 +112,7 @@ public class Products extends VerticalLayout {
                     if(!filter.getValue().isEmpty()){
                         listingProductsFilter(products, filter.getValue());
                     }
+                    filter.clear();
                 });
                 });
 
@@ -133,7 +128,8 @@ public class Products extends VerticalLayout {
         for(int i=0; i<productsNum; i++)
         {
              ColumnLay columnLay = new ColumnLay(products.get(i).getId(), products.get(i).getName(), "frontend/images/" +
-                        products.get(i).getImage(), products.get(i).getPrice(), products.get(i).getQuantity(), products.get(i).getDescription());
+                        products.get(i).getImage(), products.get(i).getPrice(), products.get(i).getQuantity(),
+                        products.get(i).getDescription());
                 storingTemp.add(columnLay);
 
                 if (storingTemp.size() == 4) {
@@ -160,14 +156,10 @@ public class Products extends VerticalLayout {
             row.setComponentSpan(storingTemp.get(0),1);
         }
 
-
         add(board);
     }
 
     public void listingProductsFilter(ArrayList<Product> products, String filter) {
-
-        //Board board2 = new Board();
-
         board.removeAll();
 
         ArrayList<ColumnLay> storingTemp = new ArrayList<>();
@@ -231,10 +223,12 @@ public class Products extends VerticalLayout {
         horizontalLayout.add(login);
         Button registration = new Button("Registration");
         horizontalLayout.add(registration);
-        Button logout = new Button("Logout");
-        horizontalLayout.add(logout);
         Button cart = new Button("Cart");
         horizontalLayout.add(cart);
+        Button orders = new Button("Orders");
+        horizontalLayout.add(orders);
+        Button logout = new Button("Logout");
+        horizontalLayout.add(logout);
         Button edit = new Button("Edit");
         if(Names.ADMIN.equals(wrappedSession.getAttribute(Names.USERNAME))) {
             horizontalLayout.add(edit);
@@ -254,19 +248,17 @@ public class Products extends VerticalLayout {
             cartLogo.getUI().ifPresent(ui -> ui.navigate(Names.PURCHASE));
         });
 
-//        if(session.getAttribute("username") != null){
-//            cartLogo.addClickListener( event-> {
-//                cartLogo.getUI().ifPresent(ui -> ui.navigate("purchase"));
-//            });
-//        } else {
-//            cartLogo.addClickListener( event-> {
-//                cartLogo.getUI().ifPresent(ui -> ui.navigate("login"));
-//            });
-//        }
-
         cart.addClickListener(event-> {
             if(wrappedSession.getAttribute(Names.USERNAME) != null) {
                 cart.getUI().ifPresent(ui -> ui.navigate(Names.PURCHASE));
+            } else {
+                notLoggedInNotification.open();
+            }
+        });
+
+        orders.addClickListener(event-> {
+            if(wrappedSession.getAttribute(Names.USERNAME) != null) {
+                orders.getUI().ifPresent(ui -> ui.navigate(Names.ORDERS));
             } else {
                 notLoggedInNotification.open();
             }
@@ -301,6 +293,9 @@ public class Products extends VerticalLayout {
         cart.getStyle().set("theme", "primary");
         cart.getStyle().set("margin", "auto 10px auto 10px");
         cart.getStyle().set("color", "#233348");
+        orders.getStyle().set("theme", "primary");
+        orders.getStyle().set("margin", "auto 10px auto 10px");
+        orders.getStyle().set("color", "#233348");
         edit.getStyle().set("theme", "primary");
         edit.getStyle().set("margin", "auto 10px auto 10px");
         edit.getStyle().set("color", "#233348");
@@ -329,8 +324,9 @@ public class Products extends VerticalLayout {
         horizontalLayout.getStyle().set("border-top-right-radius", "10px");
         horizontalLayout.getStyle().set("border-top-left-radius", "10px");
 
-        Label label = new Label("Footer");
-        label.getStyle().set("margin", "10px 10px 10px 50px");
+        Label label = new Label("© Copyright");
+        label.getStyle().set("margin", "10px auto 10px auto");
+        label.getStyle().set("color", "#233348");
 
         horizontalLayout.add(label);
 

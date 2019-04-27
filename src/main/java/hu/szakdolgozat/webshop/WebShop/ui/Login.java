@@ -82,9 +82,6 @@ public class Login extends VerticalLayout{
             wrappedSession.setAttribute(Names.USERNAME, userName.getValue());
 
             loginButton.getUI().ifPresent(ui -> ui.navigate(Names.ADMIN));
-//            productsButton.addClickListener(event -> {
-//                productsButton.getUI().ifPresent(ui -> ui.navigate("admin"));
-//            });
         } else if (user != null) {
             if (user.getUserName().equals(userName.getValue()) && passwordEncoder.matches(password.getValue(), user.getPassword())) {
                 wrappedSession.setAttribute(Names.USERNAME, userName.getValue());

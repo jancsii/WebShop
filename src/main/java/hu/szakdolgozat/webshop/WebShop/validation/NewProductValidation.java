@@ -38,10 +38,10 @@ public class NewProductValidation {
     }
 
     public boolean productModify(String productData, int minL, int maxL) {
-        return (productData.trim().length() > minL && productData.trim().length() < maxL) ? true : false;
+        return (productData.trim().length() > minL && productData.trim().length() < maxL);
     }
 
     public boolean productModifyNum(String productData) {
-        return (productData.trim().length() > 0 && productData.matches("[0-9]+")) ? true : false;
+        return (productData.trim().length() > 0 && productData.matches("[0-9]+"));
     }
 }

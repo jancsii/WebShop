@@ -1,12 +1,9 @@
 package hu.szakdolgozat.webshop.WebShop.service;
 
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
 import hu.szakdolgozat.webshop.WebShop.entity.Orders;
 import hu.szakdolgozat.webshop.WebShop.repository.OrdersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 @Service
 public class OrdersServiceImpl implements OrdersService{

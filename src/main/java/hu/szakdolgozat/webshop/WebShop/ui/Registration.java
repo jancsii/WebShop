@@ -67,7 +67,6 @@ public class Registration extends VerticalLayout {
         binder.bindInstanceFields(this);
         binder.setBean(user);
 
-
         firstName.setValueChangeMode(ValueChangeMode.EAGER);
 
         lastName.setValueChangeMode(ValueChangeMode.EAGER);
@@ -79,7 +78,6 @@ public class Registration extends VerticalLayout {
         address.setValueChangeMode(ValueChangeMode.EAGER);
 
         email.setValueChangeMode(ValueChangeMode.EAGER);
-
 
         layoutWithBinder.addFormItem(firstName, "First name");
         layoutWithBinder.addFormItem(lastName, "Last name");
@@ -120,7 +118,6 @@ public class Registration extends VerticalLayout {
                         "Incorrect address(Min length:10)",10,50))
                 .bind(User::getAddress, User::setAddress);
 
-        //save.addClickListener(event -> userService.save(user));
         save.addClickListener(event -> {
             ArrayList<User> users = (ArrayList<User>) userService.getAllUsers();
             for(int i=0; i<users.size(); i++)
@@ -174,7 +171,6 @@ public class Registration extends VerticalLayout {
         save.getElement().setAttribute("theme", "primary");
         login.getElement().setAttribute("theme", "primary");
 
-        //infoLabel.getStyle().set("margin-left", "50px");
         infoLabel.getStyle().set("width", "650px");
         infoLabel.getStyle().set("color", "#F6544C");
         reset.getStyle().set("margin-left", "595px");

@@ -47,33 +47,10 @@ public class Admin extends VerticalLayout  {
     @PostConstruct
     public void init()
     {
-        //this.getStyle().set("width", "1111px");
         this.getStyle().set("padding", "0px");
         this.getStyle().set("background-color", "#233348");
-        buttons.add(newProduct, watchProducts);
-        buttons.getStyle().set("margin", "0px 0px 0px 12px");
-        newProduct.getStyle().set("margin", "0px 0px 10px 150px");
-        watchProducts.getStyle().set("margin", "0px 0px 10px 15px");
-        wrappedSession = session.getSession();
 
-        vl.add(productNameLabel, productImageLabel, productCategoryLabel, productPriceLabel, productQuantityLabel,
-                productDescriptionLabel);
-
-        vl.getStyle().set("width", "90px");
-        hl.setWidth("96%");
-        hl.getStyle().set("margin", "0 auto");
-        productNameLabel.getStyle().set("color", "#53A8FF");
-        productImageLabel.getStyle().set("color", "#53A8FF");
-        productCategoryLabel.getStyle().set("color", "#53A8FF");
-        productPriceLabel.getStyle().set("color", "#53A8FF");
-        productQuantityLabel.getStyle().set("color", "#53A8FF");
-        productDescriptionLabel.getStyle().set("color", "#53A8FF");
-        productNameLabel.getStyle().set("margin", "51px 0px 0px 0px");
-        productImageLabel.getStyle().set("margin", "16px 0px 0px 0px");
-        productCategoryLabel.getStyle().set("margin", "17px 0px 0px 0px");
-        productPriceLabel.getStyle().set("margin", "19px 0px 0px 0px");
-        productQuantityLabel.getStyle().set("margin", "20px 0px 0px 0px");
-        productDescriptionLabel.getStyle().set("margin", "21px 0px 0px 0px");
+        style();
 
         if(Names.ADMIN.equals(wrappedSession.getAttribute(Names.USERNAME))) {
             ArrayList<Product> products = (ArrayList<Product>) productService.getAllProducts();
@@ -86,7 +63,6 @@ public class Admin extends VerticalLayout  {
             UI.getCurrent().navigate(Names.DENIED);
             UI.getCurrent().getPage().executeJavaScript("location.reload();");
         }
-
     }
 
     public void listingProducts(ArrayList<Product> products) {
@@ -98,12 +74,9 @@ public class Admin extends VerticalLayout  {
 
         for(int i=0; i<productsNum; i++)
         {
-            //productId = productService.findByName(products.get(i).getName()).getId();
             ColumnLay columnLay = new ColumnLay(products.get(i).getId(), products.get(i).getName(), products.get(i).getPrice(),
                     products.get(i).getQuantity(), products.get(i).getImage(), products.get(i).getCategory(), products.get(i).getDescription(),
                     productService);
-            //ColumnLay columnLay = new ColumnLay(products.get(i).getName(), "frontend/images/" +
-            //        products.get(i).getImage(), products.get(i).getPrice(), products.get(i).getQuantity());
             storingTemp.add(columnLay);
 
             if(storingTemp.size()==4)
@@ -131,5 +104,32 @@ public class Admin extends VerticalLayout  {
         hl.add(vl, board);
         add(hl);
         add(buttons);
+    }
+
+    public void style() {
+        buttons.add(newProduct, watchProducts);
+        buttons.getStyle().set("margin", "0px 0px 0px 12px");
+        newProduct.getStyle().set("margin", "0px 0px 10px 150px");
+        watchProducts.getStyle().set("margin", "0px 0px 10px 15px");
+        wrappedSession = session.getSession();
+
+        vl.add(productNameLabel, productImageLabel, productCategoryLabel, productPriceLabel, productQuantityLabel,
+                productDescriptionLabel);
+
+        vl.getStyle().set("width", "90px");
+        hl.setWidth("96%");
+        hl.getStyle().set("margin", "0 auto");
+        productNameLabel.getStyle().set("color", "#53A8FF");
+        productImageLabel.getStyle().set("color", "#53A8FF");
+        productCategoryLabel.getStyle().set("color", "#53A8FF");
+        productPriceLabel.getStyle().set("color", "#53A8FF");
+        productQuantityLabel.getStyle().set("color", "#53A8FF");
+        productDescriptionLabel.getStyle().set("color", "#53A8FF");
+        productNameLabel.getStyle().set("margin", "51px 0px 0px 0px");
+        productImageLabel.getStyle().set("margin", "16px 0px 0px 0px");
+        productCategoryLabel.getStyle().set("margin", "17px 0px 0px 0px");
+        productPriceLabel.getStyle().set("margin", "19px 0px 0px 0px");
+        productQuantityLabel.getStyle().set("margin", "20px 0px 0px 0px");
+        productDescriptionLabel.getStyle().set("margin", "21px 0px 0px 0px");
     }
 }
